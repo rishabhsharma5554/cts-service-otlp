@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  # batch metrics before sending to reduce API usage
+  batch:
+
+exporters:
+  kafka/traces: # Separate Kafka exporters for each data type
+    brokers: [ "kafka:9092" ]
+    topic: "otlp-trace-topic"
+    encoding: "otlp_json"
+    protocol_version: 3.7.0
+
+  kafka/logs:
+    brokers: [ "kafka:9092" ]
+    topic: "otlp-log-topic"
+    encoding: "otlp_json"
+    protocol_version: 3.7.0
+
+  kafka/metrics:
+    brokers: [ "kafka:9092" ]
+    topic: "otlp-metric-topic"
+    encoding: "otlp_json"
+    protocol_version: 3.7.0
+
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ kafka/traces ]
+
+    logs:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ kafka/logs ]
+
+    metrics:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ kafka/metrics ]

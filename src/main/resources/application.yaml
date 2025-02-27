@@ -1,0 +1,31 @@
+server:
+  port: 9090
+spring:
+  application:
+    name: CTS-SERVICE
+
+otel:
+  instrumentation:
+    logback-appender:
+      enabled: true
+#      experimental:
+#        capture-logger-context-attributes: true
+#        capture-code-attributes: true
+#        capture-key-value-pair-attributes: true
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
+      protocol: grpc
+      compression: none
+      traces:
+        endpoint: http://localhost:4317
+      metrics:
+        endpoint: http://localhost:4317
+      logs:
+        endpoint: http://localhost:4317
+
+# Ensures all spans are captured
+management:
+  tracing:
+    sampling:
+      probability: 1.0
